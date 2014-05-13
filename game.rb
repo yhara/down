@@ -61,7 +61,7 @@ class Game
     @state.reset 
     @demo_time = 0
     SDL::Mixer.playMusic($sound.bgm, -1) if $CONF_MUSIC && !@demo
-    halt_waves
+    halt_waves if $CONF_SOUND
   end
 
   def run(demo=false)
