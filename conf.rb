@@ -12,7 +12,7 @@ configです。自分用に作っただけなんで、まだロクにテスト�
   menu = なんとかかんとか（データ形式 を参照）
   screen = SDL::setVideoMode(...
   font = SDL::TTF.open(...
-  conf = Config.new(screen,font,menu)
+  conf = Conf.new(screen,font,menu)
 
 で準備完了、あとは conf.run でインタラクティブかつグラフィカルなコンフィグ画面が。
 
@@ -40,7 +40,7 @@ configです。自分用に作っただけなんで、まだロクにテスト�
   ]
 
   #コンフィグオブジェクトの生成
-  conf = Config.new(screen,font,menu,configdata)
+  conf = Conf.new(screen,font,menu,configdata)
 
   #ゲーム本体の実行...
     #コンフィグメニューの実行
@@ -62,7 +62,7 @@ configです。自分用に作っただけなんで、まだロクにテスト�
     [],
     ["#Exit"]
   ]
-  conf_sound = Config.new(screen,font,menu_sound)
+  conf_sound = Conf.new(screen,font,menu_sound)
 
   #親の定義
   menu_main = [
@@ -72,13 +72,13 @@ configです。自分用に作っただけなんで、まだロクにテスト�
     [],
     ["#Exit"]
   ]
-  conf_main = Config.new(screen,font,menu_main)
+  conf_main = Conf.new(screen,font,menu_main)
 
   #実行
   conf_main.run
 
 組み込みの["#Exit"]は、以下と同じです。
-  conf = Config.new(screen,font)
+  conf = Conf.new(screen,font)
   conf.add_menuitem( ["Exit",proc{conf.quit}] )
 
 ==config画面での操作方法
@@ -91,7 +91,7 @@ configです。自分用に作っただけなんで、まだロクにテスト�
 * Choiceにブロックを渡すと項目変更時に選択項目を渡して実行してくれる。っての
     ["sound",["on","off], proc{|select| if select=="on" then flag_sound=true end} ]
   とか。
-* "#Key Config"で簡易キーコンフィグ(Config::KeyConfigのオブジェクト)を実行
+* "#Key Conf"で簡易キーコンフィグ(Conf::KeyConfのオブジェクト)を実行
 * 音設定
 
 ==内部実装について
@@ -107,7 +107,7 @@ configです。自分用に作っただけなんで、まだロクにテスト�
 *とすると、initializeにはmenudataとconfigdataしか渡されない(@selectedはそれらから生成する)
 *またmenudataのみしか渡されない場合もある。
 
-*runにおいては@selectedのみを操作し、runの終了時に@selected => @configdataとする。(Config#renew_configdata)
+*runにおいては@selectedのみを操作し、runの終了時に@selected => @configdataとする。(Conf#renew_configdata)
  即ちrunする前に、@selectedが@configdataに同期している必要がある。
 *$CONF_xxがあれば@configdataはいらない。
  データのセーブ方法を新しく考える必要あり。
@@ -119,7 +119,7 @@ configです。自分用に作っただけなんで、まだロクにテスト�
 
 require "sdl"
 
-class Config
+class Conf
 
 private
   COL_HILIGHT = [0,255,255]
@@ -170,7 +170,7 @@ private
 Choiceの選択肢にはStringの他、Fixnum等も使えます（表示時に.to_sしているので）。
 Choice,Commandの項目名はStringしか使えません(それ以外のものを渡すとArgumentErrorが発生します)。
 
-Choiceの項目名は重複させるべきではありません（重複するとConfig#[]とかConfig#dataで困ることになるでしょう）。
+Choiceの項目名は重複させるべきではありません（重複するとConf#[]とかConf#dataで困ることになるでしょう）。
 =end
 
   # 上のフォーマットに従った配列を受け取り、
@@ -240,12 +240,12 @@ public
 =begin
 ==クラスメソッド
 --- initialize(screen,font[,menudata])
-    Configクラスのオブジェクトを生成して返します。
+    Confクラスのオブジェクトを生成して返します。
 
     screenにはSDLのscreenを、fontにはSDL::TTFオブジェクトを、
     menudataにはコンフィグメニューのメニューデータを指定します（((<データ形式>))を参照）。
 
-    menudataを省略した場合は、Config#runを呼ぶ前に必ずConfig#add_menuitem(s)によりメニューデータを与えなければいけません。
+    menudataを省略した場合は、Conf#runを呼ぶ前に必ずConf#add_menuitem(s)によりメニューデータを与えなければいけません。
 =end
   def initialize(*args)
     raise ArgumentError,"wrong # of arguments" if args.size<2 || args.size>4
@@ -466,14 +466,14 @@ public
 --- savedata
     コンフィグデータをMarshal可能なオブジェクトに変換したものを返します。(現在の実装では、Hashが返されます)
 
-    Config.initializeやConfig#add_menuitems等でメニューデータをセットしてから呼び出してください。
+    Conf.initializeやConf#add_menuitems等でメニューデータをセットしてから呼び出してください。
     ((-というのは、$CONF_xxのうち、メニューデータにあるものしかセーブしないからです。-))
 
 --- loaddata(data)
-    Config#savedataが返したオブジェクトを読み込みます。dataが明かに不適切(つまり現在の実装では、Hash以外)な時は
+    Conf#savedataが返したオブジェクトを読み込みます。dataが明かに不適切(つまり現在の実装では、Hash以外)な時は
     何もしません。
 
-    Config.initializeやConfig#add_menuitems等でメニューデータをセットしてから呼び出してください。
+    Conf.initializeやConf#add_menuitems等でメニューデータをセットしてから呼び出してください。
     ((-というのは、メニューデータをセットする時に「どれを選んだか」という情報がリセットされるからです。
     これは直そうとすれば直せるのですが、コードが少し複雑になるので仕様としています。-))
 =end
@@ -523,14 +523,14 @@ if __FILE__==$0 then
   font = SDL::TTF.open("boxfont2.ttf",24)
 
 
-  conf1 = Config.new(screen, font, [
+  conf1 = Conf.new(screen, font, [
     ["music vol", ["off","10","20",30,"40","50","60","70","80","90","100"], false ],
     ["sound", [true,false]],
     [nil],
     ["#exit"],
   ], {"sound"=>"auto"})
 
-  conf = Config.new(screen, font, [
+  conf = Conf.new(screen, font, [
     ["display", ["window","fullscreen"], true ],
     [],
     ["sound setting",proc{conf1.run}],

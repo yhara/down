@@ -65,7 +65,7 @@ class SavedataManager
   end
 end
 #------------------------------------------------------------------------------
-class MyConfig < Config
+class MyConfig < Conf
   #constants
   FONT_CONFIG = "image/boxfont2.ttf"
   FONT_CONFIG_SIZE = 24
