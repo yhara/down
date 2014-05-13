@@ -121,7 +121,7 @@ class Main
   #init main
   def initialize
     #screen
-    if $OPT_f || $OPT_fullscreen
+    if $OPT_f
       @screen = SDL::setVideoMode(640,480,16,SDL::SWSURFACE|SDL::DOUBLEBUF|SDL::FULLSCREEN)
       SDL::Mouse.hide
     else
@@ -207,5 +207,3 @@ private
   end
 
 end
-
-
