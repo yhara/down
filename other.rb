@@ -176,8 +176,8 @@ class Game
   module Chara
     include Constants
 
-    #�摜�t�@�C�����P���ɂ܂Ƃ߂Ă����̖��c��B
-    #���̂����S��Symbol�ɂ�����
+    #画像ファイルを１枚にまとめてた時の名残り。
+    #そのうち全部Symbolにしたい
     EMPTY,WALL,BLOCK,HARI,HITO,SAKEBI = [0,1,2,3,4,5]
     STAR,PARA,OMORI,HITOPARA,HITOOMORI = [7,8,9,10,11]
     HITODEAD,HITOWAVE,HITOMUTEKI = [13,14,15]

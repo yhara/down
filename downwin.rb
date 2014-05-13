@@ -1,5 +1,5 @@
 #
-# downwin.rb : ƒEƒBƒ“ƒhƒEƒYã‚©‚çƒtƒH[ƒ€‚ğ•\¦‚µ‚Ä‹N“®‚·‚é
+# downwin.rb : ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚ºä¸Šã‹ã‚‰ãƒ•ã‚©ãƒ¼ãƒ ã‚’è¡¨ç¤ºã—ã¦èµ·å‹•ã™ã‚‹
 #
 
 require 'vr/vruby'
@@ -35,7 +35,7 @@ module Frm_form
   end
 
   def self_close
-    #u•Â‚¶‚évƒ{ƒ^ƒ“
+    #ã€Œé–‰ã˜ã‚‹ã€ãƒœã‚¿ãƒ³
     @exec = false
   end
   attr_reader :exec

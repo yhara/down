@@ -173,7 +173,7 @@ class Game
         SDL::Mixer.playChannel(-1,$sound.gameover,0) if $CONF_SOUND
       end
     else
-      #ˆê’èŠÔŒãAƒQ[ƒ€‚ğÅ‰‚©‚çn‚ß‚é
+      #ä¸€å®šæ™‚é–“å¾Œã€ã‚²ãƒ¼ãƒ ã‚’æœ€åˆã‹ã‚‰å§‹ã‚ã‚‹
       @gameovertimer.wait(dt) do
         unless @demo
           if @highscores.size<HIGHSCORES || @highscores[-1].score<@score
@@ -216,7 +216,7 @@ class Game
     @font.drawBlendedUTF8(@screen,"FPS:#{@system.fps}",      640-80, 0, 127,127,127)
     @font.drawBlendedUTF8(@screen,"SCORE RANKING",           Field::RIGHT+32, 2, 255,255,255)
     @highscores[0,HIGHSCORES].each_with_index do |score,i|
-      color = (score.version<Score::VERSION) ? [127,127,127] : [200,255,255]  #ŒÃ‚¢ƒXƒRƒA‚ÍŠDF‚Å
+      color = (score.version<Score::VERSION) ? [127,127,127] : [200,255,255]  #å¤ã„ã‚¹ã‚³ã‚¢ã¯ç°è‰²ã§
       @font.drawBlendedUTF8(@screen,sprintf("%2d: %6d %s",i+1, score.score, score.name), Field::RIGHT+32, 25*(i+1), *color)
     end
     @font.drawBlendedUTF8(@screen,"SCORE:#{@score}",         Field::RIGHT+32, 300 , 255,255,255)
@@ -311,7 +311,7 @@ class Game
       @screen.fillRect(0,0,640,480,0)
       @font.drawBlendedUTF8(@screen,"SCORE RANKING",           Field::RIGHT+32, 2, 255,255,255)
       @highscores[0,HIGHSCORES].each_with_index do |score,i|
-        color = (score.version<Score::VERSION) ? [127,127,127] : [200,255,255]  #ŒÃ‚¢ƒXƒRƒA‚ÍŠDF‚Å
+        color = (score.version<Score::VERSION) ? [127,127,127] : [200,255,255]  #å¤ã„ã‚¹ã‚³ã‚¢ã¯ç°è‰²ã§
         @font.drawBlendedUTF8(@screen,sprintf("%2d: %6d %s",i+1, score.score, score.name), Field::RIGHT+32, 25*(i+1), *color)
       end
       @font.drawBlendedUTF8(@screen,"SCORE:#{@score}",         Field::RIGHT+32, 300 , 255,255,255)
@@ -340,18 +340,18 @@ class Game
   private :nameentry
 
   #------------------------------------------------------------------------------
-  # lH–³”\ (‚Ä‚«‚Æ‚¤)
+  # äººå·¥ç„¡èƒ½ (ã¦ãã¨ã†)
   #------------------------------------------------------------------------------
   def auto_decide(field,hito)
     key = Keydata.new
     key.left = key.right = false
 
-    #‹ó’†‚È‚çˆÚ“®‚µ‚È‚¢
+    #ç©ºä¸­ãªã‚‰ç§»å‹•ã—ãªã„
     if @field.can_pass?(@hito.x, @hito.y+1)
       return key
     end
     
-    #‰E’[‚È‚çA¶‚És‚­‚µ‚©‚È‚¢
+    #å³ç«¯ãªã‚‰ã€å·¦ã«è¡Œãã—ã‹ãªã„
     x = @hito.x
     until @field.can_pass?(x, @hito.y+1)
       x+=1; break if x>=Field::WID
@@ -361,7 +361,7 @@ class Game
       return key
     end
     r=x
-    #¶’[‚È‚çA‰E‚És‚­‚µ‚©‚È‚¢
+    #å·¦ç«¯ãªã‚‰ã€å³ã«è¡Œãã—ã‹ãªã„
     x = @hito.x
     until @field.can_pass?(x, @hito.y+1)
       x-=1; break if x<0
@@ -371,9 +371,9 @@ class Game
       return key
     end
     l=x
-    #‚»‚êˆÈŠO‚È‚çc
+    #ãã‚Œä»¥å¤–ãªã‚‰â€¦
 
-    #‰E‚É—‚¿‚½‚Æ‚«‚Ìó‘Ô‚ğ’²‚×‚é
+    #å³ã«è½ã¡ãŸã¨ãã®çŠ¶æ…‹ã‚’èª¿ã¹ã‚‹
     y = @hito.y
     until @field[r,y] != Chara::EMPTY
       y+=1; break if y>=Field::HEI
@@ -385,7 +385,7 @@ class Game
     end
     yr=y
 
-    #¶‚É—‚¿‚½‚Æ‚«‚Ìó‘Ô‚ğ’²‚×‚é
+    #å·¦ã«è½ã¡ãŸã¨ãã®çŠ¶æ…‹ã‚’èª¿ã¹ã‚‹
     y = @hito.y
     until @field[l,y] != Chara::EMPTY
       y+=1; break if y>=Field::HEI
@@ -398,20 +398,20 @@ class Game
     yl=y
 
     if @field[@hito.x, @hito.y+1]==Chara::HARI
-      #j‚Ìã‚È‚çA‹ß‚¢•û‚É“¦‚°‚é
+      #é‡ã®ä¸Šãªã‚‰ã€è¿‘ã„æ–¹ã«é€ƒã’ã‚‹
       if (r-@hito.x) < (@hito.x-l)
         key.right=true
       else
         key.left=true
       end
     else
-      #‚³‚à‚È‚­‚ÎAj‚Ì–³‚¢•û‚É—‚¿‚é
+      #ã•ã‚‚ãªãã°ã€é‡ã®ç„¡ã„æ–¹ã«è½ã¡ã‚‹
       if lstat==Chara::HARI
         key.right=true
       elsif rstat==Chara::HARI
         key.left=true
       else
-        #‚Ç‚Á‚¿‚Å‚à—Ç‚¯‚ê‚ÎA‹ß‚¢•û‚É—‚¿‚é
+        #ã©ã£ã¡ã§ã‚‚è‰¯ã‘ã‚Œã°ã€è¿‘ã„æ–¹ã«è½ã¡ã‚‹
         if (r-@hito.x) < (@hito.x-l)
           key.right=true
         elsif (r-@hito.x) > (@hito.x-l)

@@ -3,34 +3,34 @@
 #
 
 =begin
-= ruby/SDL�ȃQ�[���p config���j���[ 
+= ruby/SDLなゲーム用 configメニュー 
 
-==�T�v
-config�ł��B�����p�ɍ���������Ȃ�ŁA�܂����N�Ƀe�X�g���Ă܂��� :-P
-�[���P�N�قǂق��Ƃ�����Ŏ����ł��ǂ��킩��Ȃ��Ȃ��Ă܂��B
+==概要
+configです。自分用に作っただけなんで、まだロクにテストしてません :-P
+つーか１年ほどほっといたんで自分でも良くわからなくなってます。
 
-  menu = �Ȃ�Ƃ�����Ƃ��i�f�[�^�`�� ���Q�Ɓj
+  menu = なんとかかんとか（データ形式 を参照）
   screen = SDL::setVideoMode(...
   font = SDL::TTF.open(...
   conf = Config.new(screen,font,menu)
 
-�ŏ��������A���Ƃ� conf.run �ŃC���^���N�e�B�u���O���t�B�J���ȃR���t�B�O��ʂ��B
+で準備完了、あとは conf.run でインタラクティブかつグラフィカルなコンフィグ画面が。
 
-==�ȒP�Ȏg�p��
+==簡単な使用例
 
-  #SDL�̏���
+  #SDLの準備
   SDL.init(SDL::INIT_VIDEO)
   screen = SDL::setVideoMode(640,480,16,SDL::SWSURFACE)
 
   SDL::TTF.init
   font = SDL::TTF.open("font.ttf",24)
 
-  #�R���t�B�O�f�[�^�̃��[�h
+  #コンフィグデータのロード
   open("savedata.dat","r") do |file|
     configdata = Marshal.load(file)
   end
 
-  #���j���[�f�[�^�̒�`
+  #メニューデータの定義
   menu = [
     ["Level", ["Easy","Normal","Hard"] ],
     ["Music", [true,false] ],
@@ -39,81 +39,81 @@ config�ł��B�����p�ɍ���������Ȃ�ŁA�܂����N�Ƀe�X�g���Ă܂��� :-P
     ["#Exit"]
   ]
 
-  #�R���t�B�O�I�u�W�F�N�g�̐���
+  #コンフィグオブジェクトの生成
   conf = Config.new(screen,font,menu,configdata)
 
-  #�Q�[���{�̂̎��s...
-    #�R���t�B�O���j���[�̎��s
+  #ゲーム本体の実行...
+    #コンフィグメニューの実行
     conf.run
 
-  #�f�[�^�Z�[�u
+  #データセーブ
   open("savedata.dat","w") do |file|
     Marshal.dump( conf.data, file )
   end
 
-==���G�Ȏg�p��(���p��)
-�ȉ��̂悤�Ȃ�肩���ŁA�R���t�B�O���j���[���u����q�v�ɂ��邱�Ƃ��ł��܂��B
+==複雑な使用例(応用編)
+以下のようなやりかたで、コンフィグメニューを「入れ子」にすることができます。
 
-  #�q�̒�`
+  #子の定義
   menu_sound = [
     ["Music", ["On","Off"] ],
     ["Sound", ["On","Off"] ],
-    ["Sampling Rate", [44100,22050,11025] ]  #���l���n����̂ł� :)
+    ["Sampling Rate", [44100,22050,11025] ]  #数値も渡せるのです :)
     [],
     ["#Exit"]
   ]
   conf_sound = Config.new(screen,font,menu_sound)
 
-  #�e�̒�`
+  #親の定義
   menu_main = [
     ["Level", ["Easy","Normal","Hard","Maniac"] ],
     [],
-    ["Sound Settings", proc{ conf_sound.run }], #�������|�C���g
+    ["Sound Settings", proc{ conf_sound.run }], #ここがポイント
     [],
     ["#Exit"]
   ]
   conf_main = Config.new(screen,font,menu_main)
 
-  #���s
+  #実行
   conf_main.run
 
-�g�ݍ��݂�["#Exit"]�́A�ȉ��Ɠ����ł��B
+組み込みの["#Exit"]は、以下と同じです。
   conf = Config.new(screen,font)
   conf.add_menuitem( ["Exit",proc{conf.quit}] )
 
-==config��ʂł̑�����@
-�㉺�ō��ڂ̑I���A���E�őI�����̑I���BSPACE�܂���ENTER�ō��ڂ̎��s�AESC�ŏI��
+==config画面での操作方法
+上下で項目の選択、左右で選択肢の選択。SPACEまたはENTERで項目の実行、ESCで終了
 
 ==TODO
 
-*(�傫����s) <=����񂩁H
-*(�L�[��`���ςɁi�����܂ł��邩�H�j)
-* Choice�Ƀu���b�N��n���ƍ��ڕύX���ɑI�����ڂ�n���Ď��s���Ă����B���Ă�
+*(大きい空行) <=いらんか？
+*(キー定義を可変に（そこまでするか？）)
+* Choiceにブロックを渡すと項目変更時に選択項目を渡して実行してくれる。っての
     ["sound",["on","off], proc{|select| if select=="on" then flag_sound=true end} ]
-  �Ƃ��B
-* "#Key Config"�ŊȈՃL�[�R���t�B�O(Config::KeyConfig�̃I�u�W�F�N�g)�����s
-* ���ݒ�
+  とか。
+* "#Key Config"で簡易キーコンフィグ(Config::KeyConfigのオブジェクト)を実行
+* 音設定
 
-==���������ɂ���
+==内部実装について
 
-*�f�[�^�Ƃ��Ĕz��@menu�ƃn�b�V��@selected�ƃO���[�o���ϐ�$CONF_xx�����B
-*@menu�́A�N���X(���͍\����)Choice,Command,Space�̃I�u�W�F�N�g��v�f�Ɏ��z��B
+*データとして配列@menuとハッシュ@selectedとグローバル変数$CONF_xxを持つ。
+*@menuは、クラス(実は構造体)Choice,Command,Spaceのオブジェクトを要素に持つ配列。
 
-�ȉ��͌Â����B
+以下は古い情報。
 
-*�f�[�^�Ƃ��Ĕz��@menu�ƁA�n�b�V��@selected�ƁA�n�b�V��@configdata��3�����B
- (�����̓������Ƃ�̂��߂�ǂ��������ۂ�)
-*@menu�̓v���O�����ɑ΂��ÓI�Ȃ̂ŁA�Z�[�u����Ƃ��ɂ�@configdata����������΂悢�B
-*�Ƃ���ƁAinitialize�ɂ�menudata��configdata�����n����Ȃ�(@selected�͂���炩�琶������)
-*�܂�menudata�݂̂����n����Ȃ��ꍇ������B
+*データとして配列@menuと、ハッシュ@selectedと、ハッシュ@configdataの3つを持つ。
+ (これらの同期をとるのがめんどくさいっぽい)
+*@menuはプログラムに対し静的なので、セーブするときには@configdataだけがあればよい。
+*とすると、initializeにはmenudataとconfigdataしか渡されない(@selectedはそれらから生成する)
+*またmenudataのみしか渡されない場合もある。
 
-*run�ɂ����Ă�@selected�݂̂𑀍삵�Arun�̏I������@selected => @configdata�Ƃ���B(Config#renew_configdata)
- ����run����O�ɁA@selected��@configdata�ɓ������Ă���K�v������B
-*$CONF_xx�������@configdata�͂���Ȃ��B
- �f�[�^�̃Z�[�u���@��V�����l����K�v����B
-*["music"=>$CONF_music,"sound"=>$CONF_sound, ...]�݂����ȃn�b�V�����Z�[�u���ɍ쐬����
+*runにおいては@selectedのみを操作し、runの終了時に@selected => @configdataとする。(Config#renew_configdata)
+ 即ちrunする前に、@selectedが@configdataに同期している必要がある。
+*$CONF_xxがあれば@configdataはいらない。
+ データのセーブ方法を新しく考える必要あり。
+*["music"=>$CONF_music,"sound"=>$CONF_sound, ...]みたいなハッシュをセーブ時に作成して
 
-*initialize��load���킯��Ƃ�
+*initializeとloadをわけるとか
 
 =end
 
@@ -132,7 +132,7 @@ private
   Space = Struct.new("Space",:enlarge)
 
 =begin  
-==�f�[�^�`��
+==データ形式
   menu = [
     ["display", ["window","fullscreen"]],
     ["sound", ["on","off","auto"]],
@@ -141,41 +141,41 @@ private
     ["key config",Proc.new{key_config}]
     ["#exit"]
   ]
-�Ƃ��B
+とか。
 
-�e���j���[���ڂ́A
+各メニュー項目は、
 *Choice
    ["Music", [true,false]]
- �I���B��R�����Ń��[�v���邩�ǂ������w��ł��܂� ((-��߂邩��-))
+ 選択。第３引数でループするかどうかを指定できます ((-やめるかも-))
 
- ���̏ꍇ�A$CONF_Music�Ƃ����ϐ���true��������false���Z�b�g����܂��B
- ��ʏ�ł́Atrue��"ON", false��"OFF"�ƕ\������܂��i�ݒ�\�j�B
+ この場合、$CONF_Musicという変数にtrueもしくはfalseがセットされます。
+ 画面上では、true→"ON", false→"OFF"と表示されます（設定可能）。
 
- ����āAChoice�̍��ږ��ɂ͔��p�p�����Ƌ󔒁A`_'�ȊO�̕����͎g���܂���B�󔒂�'_'�ɕϊ�����܂��B
+ よって、Choiceの項目名には半角英数字と空白、`_'以外の文字は使えません。空白は'_'に変換されます。
 
- ��:
-   ["MUSIC VOL",[0,10,20,(�ȗ�),90,100 ]]  #=> $CONF_MUSIC_VOL = 0 ��
+ 例:
+   ["MUSIC VOL",[0,10,20,(省略),90,100 ]]  #=> $CONF_MUSIC_VOL = 0 等
 *Command  
    ["key config", proc{key_config} ]
- space�܂���enter�������ꂽ�Ƃ���Proc�����s
+ spaceまたはenterが押されたときにProcを実行
 *Space
-   []�܂���[nil]
- ��s�B
+   []または[nil]
+ 空行。
 *Exit
-   ["#exit"]�܂���["#EXIT"]�܂���["#Exit"]
- �I�����ꂽ�Ƃ��Ƀ��j���[���I��
+   ["#exit"]または["#EXIT"]または["#Exit"]
+ 選択されたときにメニューを終了
 
-�̂ǂꂩ���w�肵�܂��B
+のどれかを指定します。
 
-Choice�̑I�����ɂ�String�̑��AFixnum�����g���܂��i�\������.to_s���Ă���̂Łj�B
-Choice,Command�̍��ږ���String�����g���܂���(����ȊO�̂��̂�n����ArgumentError���������܂�)�B
+Choiceの選択肢にはStringの他、Fixnum等も使えます（表示時に.to_sしているので）。
+Choice,Commandの項目名はStringしか使えません(それ以外のものを渡すとArgumentErrorが発生します)。
 
-Choice�̍��ږ��͏d��������ׂ��ł͂���܂���i�d�������Config#[]�Ƃ�Config#data�ō��邱�ƂɂȂ�ł��傤�j�B
+Choiceの項目名は重複させるべきではありません（重複するとConfig#[]とかConfig#dataで困ることになるでしょう）。
 =end
 
-  # ��̃t�H�[�}�b�g�ɏ]�����z����󂯎��A
-  # �K�؂ȃI�u�W�F�N�g(Choice,Command,Space)��Ԃ��B
-  # �����@selected,$CONF_xx������������B
+  # 上のフォーマットに従った配列を受け取り、
+  # 適切なオブジェクト(Choice,Command,Space)を返す。
+  # さらに@selected,$CONF_xxを初期化する。
   def menuitemize(item)
     case item.size
     when 0
@@ -196,7 +196,7 @@ Choice�̍��ږ��͏d��������ׂ��ł͂���܂���i�d�������Config#[]�Ƃ�Config#data
       end
       
     when 2
-      if item[0]==nil then  #�傫���󔒁i�������j
+      if item[0]==nil then  #大きい空白（未実装）
         Space.new(item[1])
       elsif item[1].is_a? Proc then
 	raise ArgumentError,"title of a Command must be String" unless item[0].is_a? String
@@ -215,7 +215,7 @@ Choice�̍��ږ��͏d��������ׂ��ł͂���܂���i�d�������Config#[]�Ƃ�Config#data
     end
   end
 
-  #�󔒂��X�y�[�X�ɁA�L���������Ă���G���[
+  #空白をスペースに、記号が入ってたらエラー
   def quote_space(name)
     raise ArgumentError,"title of Choice must be String" unless name.is_a? String
     if name=~/[^A-Za-z0-9_ ]/ then
@@ -225,7 +225,7 @@ Choice�̍��ږ��͏d��������ׂ��ł͂���܂���i�d�������Config#[]�Ƃ�Config#data
   end
 
   # @selected -> $CONF_xx
-  # (run�̏I�����Ɏg��)
+  # (runの終了時に使う)
   def renew_configdata
     @menu.each do |item|
       if item.is_a? Choice then
@@ -238,14 +238,14 @@ Choice�̍��ږ��͏d��������ׂ��ł͂���܂���i�d�������Config#[]�Ƃ�Config#data
 public
 
 =begin
-==�N���X���\�b�h
+==クラスメソッド
 --- initialize(screen,font[,menudata])
-    Config�N���X�̃I�u�W�F�N�g�𐶐����ĕԂ��܂��B
+    Configクラスのオブジェクトを生成して返します。
 
-    screen�ɂ�SDL��screen���Afont�ɂ�SDL::TTF�I�u�W�F�N�g���A
-    menudata�ɂ̓R���t�B�O���j���[�̃��j���[�f�[�^���w�肵�܂��i((<�f�[�^�`��>))���Q�Ɓj�B
+    screenにはSDLのscreenを、fontにはSDL::TTFオブジェクトを、
+    menudataにはコンフィグメニューのメニューデータを指定します（((<データ形式>))を参照）。
 
-    menudata���ȗ������ꍇ�́AConfig#run���ĂԑO�ɕK��Config#add_menuitem(s)�ɂ�胁�j���[�f�[�^��^���Ȃ���΂����܂���B
+    menudataを省略した場合は、Config#runを呼ぶ前に必ずConfig#add_menuitem(s)によりメニューデータを与えなければいけません。
 =end
   def initialize(*args)
     raise ArgumentError,"wrong # of arguments" if args.size<2 || args.size>4
@@ -279,34 +279,34 @@ public
   attr_accessor :margin_top,:margin_left,:line_height
 
 =begin   
-==���\�b�h
+==メソッド
 --- margin_top
 --- margin_left
 --- line_height
-    ���ꂼ��A�R���t�B�O��ʂ̏�̗]���A���̗]���A�P�s�̍�����\���܂��B������ł��܂��B�f�t�H���g�ł�
+    それぞれ、コンフィグ画面の上の余白、左の余白、１行の高さを表します。代入もできます。デフォルトでは
       margin_top  = 32
       margin_left = 32
-      line_height = (������"pjfM"�����݂̃t�H���g�ŕ`�悵���Ƃ��̍���) * 1.5
-    �ƂȂ��Ă��܂��B�i�P�ʁFpixel�j
+      line_height = (文字列"pjfM"を現在のフォントで描画したときの高さ) * 1.5
+    となっています。（単位：pixel）
 
 --- add_menuitem(item)
-    �V�������j���[�A�C�e��item��ǉ����܂��Bitem��Array�ł��i((<�f�[�^�`��>))���Q�Ɓj�B
+    新しいメニューアイテムitemを追加します。itemはArrayです（((<データ形式>))を参照）。
 --- add_menuitems(items)
-    �����̃��j���[�A�C�e��items(Array)��ǉ����܂��B�i�Q�ƁF((<�f�[�^�`��>))�j
+    複数のメニューアイテムitems(Array)を追加します。（参照：((<データ形式>))）
 --- quit
-    ���s���̃R���t�B�O���j���[���I�����܂��BCommand�`���̃��j���[�A�C�e���Ŏg���܂��i((<�f�[�^�`��>))���Q�Ɓj�B
+    実行中のコンフィグメニューを終了します。Command形式のメニューアイテムで使います（((<データ形式>))を参照）。
 --- on_draw{|screen,dt| ... }
-    ��ʂ̏����������Ɏ��s����鏈�����w�肵�܂��B���̏����̓��[�v���Ɏ��s����A���̏����̂��Ƃɕ������`�悳��܂��B
-    dt�͑O��Ăяo��������̌o�ߎ���(ms)�ł��B
+    画面の書き換え時に実行される処理を指定します。この処理はループ毎に実行され、この処理のあとに文字が描画されます。
+    dtは前回呼び出し時からの経過時間(ms)です。
 
-    �g�p��:
+    使用例:
       conf.on_draw{|screen,dt|
         screen.fillRect(0,0,screen.w, screen.h,[255,255,255])
       }     
 --- true_string(str)
 --- false_string(str)
-    Choice�̑I������true/false���w�肵���Ƃ��ɕ\������镶������w�肵�܂��B
-    �f�t�H���g�ł͂��ꂼ��"ON","OFF"�ł��B
+    Choiceの選択肢にtrue/falseを指定したときに表示される文字列を指定します。
+    デフォルトではそれぞれ"ON","OFF"です。
 =end
 
   def add_menuitem(item)
@@ -338,9 +338,9 @@ public
   
 =begin
 --- run
-    �R���t�B�O���j���[�����s���܂��B�����((<config��ʂł̑�����@>))���Q�Ƃ��Ă��������B
+    コンフィグメニューを実行します。操作は((<config画面での操作方法>))を参照してください。
 
-    �܂��A���݂̎d�l�ł͎��s����ƃL�[���s�[�g���I�t�ɂȂ�܂��B���ӂ��Ă��������B
+    また、現在の仕様では実行するとキーリピートがオフになります。注意してください。
 =end
 
   def run
@@ -464,18 +464,18 @@ public
 
 =begin
 --- savedata
-    �R���t�B�O�f�[�^��Marshal�\�ȃI�u�W�F�N�g�ɕϊ��������̂�Ԃ��܂��B(���݂̎����ł́AHash���Ԃ���܂�)
+    コンフィグデータをMarshal可能なオブジェクトに変換したものを返します。(現在の実装では、Hashが返されます)
 
-    Config.initialize��Config#add_menuitems���Ń��j���[�f�[�^���Z�b�g���Ă���Ăяo���Ă��������B
-    ((-�Ƃ����̂́A$CONF_xx�̂����A���j���[�f�[�^�ɂ�����̂����Z�[�u���Ȃ�����ł��B-))
+    Config.initializeやConfig#add_menuitems等でメニューデータをセットしてから呼び出してください。
+    ((-というのは、$CONF_xxのうち、メニューデータにあるものしかセーブしないからです。-))
 
 --- loaddata(data)
-    Config#savedata���Ԃ����I�u�W�F�N�g��ǂݍ��݂܂��Bdata�������ɕs�K��(�܂茻�݂̎����ł́AHash�ȊO)�Ȏ���
-    �������܂���B
+    Config#savedataが返したオブジェクトを読み込みます。dataが明かに不適切(つまり現在の実装では、Hash以外)な時は
+    何もしません。
 
-    Config.initialize��Config#add_menuitems���Ń��j���[�f�[�^���Z�b�g���Ă���Ăяo���Ă��������B
-    ((-�Ƃ����̂́A���j���[�f�[�^���Z�b�g���鎞�Ɂu�ǂ��I�񂾂��v�Ƃ�����񂪃��Z�b�g����邩��ł��B
-    ����͒������Ƃ���Β�����̂ł����A�R�[�h���������G�ɂȂ�̂Ŏd�l�Ƃ��Ă��܂��B-))
+    Config.initializeやConfig#add_menuitems等でメニューデータをセットしてから呼び出してください。
+    ((-というのは、メニューデータをセットする時に「どれを選んだか」という情報がリセットされるからです。
+    これは直そうとすれば直せるのですが、コードが少し複雑になるので仕様としています。-))
 =end
 
   def savedata
