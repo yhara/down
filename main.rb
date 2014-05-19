@@ -3,7 +3,7 @@
 #
 
 class Main
-  VERSION=0.51
+  VERSION = 0.53
 end
   
 require 'sdl'
