@@ -278,11 +278,11 @@ class Game
             
             if event.mod&SDL::Key::MOD_SHIFT != 0
               #A-Z
-              name << (?A + event.sym-SDL::Key::A).chr
+              name << ("A".ord + event.sym-SDL::Key::A).chr
               cursor+=1
             else
               #a-z
-              name << (?a + event.sym-SDL::Key::A).chr
+              name << ("a".ord + event.sym-SDL::Key::A).chr
               cursor+=1
             end
           else
