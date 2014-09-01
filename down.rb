@@ -5,8 +5,6 @@
 $LOAD_PATH.unshift "."
 require "main.rb"
 
-#------------------------------------------------------------------------------
-
 require 'optparse'
 OptionParser.new{|o|
   o.on("-s", "--silent"){
