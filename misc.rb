@@ -85,7 +85,7 @@ class State
       
       instance_eval <<-EOD
       def #{state.id2name}?
-	@state[\"#{state.id2name}\"]
+        @state[\"#{state.id2name}\"]
         end
       EOD
     end

@@ -199,12 +199,12 @@ Choiceの項目名は重複させるべきではありません（重複する�
       if item[0]==nil then  #大きい空白（未実装）
         Space.new(item[1])
       elsif item[1].is_a? Proc then
-	raise ArgumentError,"title of a Command must be String" unless item[0].is_a? String
+        raise ArgumentError,"title of a Command must be String" unless item[0].is_a? String
         Command.new(item[0],item[1])
       else
         ret = Choice.new(quote_space(item[0]), item[0], item[1], true)
-	@selected[ret.name] = 0
-	instance_eval("$#{PREFIX}#{ret.name} = ret.items[0]") # $CONF_music = ret.items[0]
+        @selected[ret.name] = 0
+        instance_eval("$#{PREFIX}#{ret.name} = ret.items[0]") # $CONF_music = ret.items[0]
         ret
       end
     when 3
@@ -230,7 +230,7 @@ Choiceの項目名は重複させるべきではありません（重複する�
     @menu.each do |item|
       if item.is_a? Choice then
         # $CONF_music = item.items[@selected['music']]
-	instance_eval("$#{PREFIX}#{item.name} = item.items[@selected[item.name]]")
+        instance_eval("$#{PREFIX}#{item.name} = item.items[@selected[item.name]]")
       end
     end
   end
@@ -386,7 +386,7 @@ public
             
           when SDL::Key::LEFT
             break if @menu[cursor].is_a? Command
-	    item = @menu[cursor]
+            item = @menu[cursor]
             @selected[item.name]-=1
             if @selected[item.name]<0 then
               @selected[item.name] = (item.loop) ? (item.items.size-1) : (0)
@@ -394,7 +394,7 @@ public
             
           when SDL::Key::RIGHT
             break if @menu[cursor].is_a? Command
-	    item = @menu[cursor]
+            item = @menu[cursor]
             @selected[item.name]+=1
             if @selected[item.name] > item.items.size-1 then
               @selected[item.name] = (item.loop) ? (0) : (item.items.size-1)
@@ -482,8 +482,8 @@ public
     ret = {}
     @menu.each do |item|
       if item.is_a? Choice then
-	# ret['music']=$CONF_music
-	instance_eval("ret['#{item.name}']=$#{PREFIX}#{item.name}")
+        # ret['music']=$CONF_music
+        instance_eval("ret['#{item.name}']=$#{PREFIX}#{item.name}")
       end
     end
     ret
@@ -503,8 +503,8 @@ public
     # $CONF_xx => @selected
     @menu.each do |item|
       if item.is_a? Choice then
-	# @selected['music'] = item.items.index( $CONF_music ) || 0 if $CONF_music!=nil
-	instance_eval("@selected[item.name] = item.items.index( $#{PREFIX}#{item.name} )||0 if $#{PREFIX}#{item.name}!=nil")
+        # @selected['music'] = item.items.index( $CONF_music ) || 0 if $CONF_music!=nil
+        instance_eval("@selected[item.name] = item.items.index( $#{PREFIX}#{item.name} )||0 if $#{PREFIX}#{item.name}!=nil")
       end
     end
   end

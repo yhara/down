@@ -114,33 +114,33 @@ class Game
 
     def act(field,hito,dt)
       if field[hito.x, hito.y+1]==Chara::HARI && !hito.muteki? then
-	#damage start
-	if @damaging==false
-	  @damaging=true
-	  hito.start_flashing
-	  @state.on(:flashing)
-	end
-	@damagetimer.wait(dt) do
+        #damage start
+        if @damaging==false
+          @damaging=true
+          hito.start_flashing
+          @state.on(:flashing)
+        end
+        @damagetimer.wait(dt) do
           SDL::Mixer.playChannel(Sound::CH_DAMAGE,$sound.damage,0) if !hito.gameover? && $CONF_SOUND
-	  @value-=1 if @value>0
-	end
-	@flashtimer.wait(dt) do
-	  if @state.red? then
-	    @state.off(:red)
-	  else
-	    @state.on(:red)
-	  end
-	end
+          @value-=1 if @value>0
+        end
+        @flashtimer.wait(dt) do
+          if @state.red? then
+            @state.off(:red)
+          else
+            @state.on(:red)
+          end
+        end
       else
-	#damage stop
-	if @damaging then
-	  @damaging=false
-	  hito.stop_flashing
-	  @state.off(:flashing)
-	  @state.off(:red)
-	  
-	  @damagetimer.reset
-	end
+        #damage stop
+        if @damaging then
+          @damaging=false
+          hito.stop_flashing
+          @state.off(:flashing)
+          @state.off(:red)
+          
+          @damagetimer.reset
+        end
       end
     end
 
@@ -165,9 +165,9 @@ class Game
       @time+=dt
       @count+=1
       if @time>=1000 then
-	@fps=@count
-	@time-=1000
-	@count=0
+        @fps=@count
+        @time-=1000
+        @count=0
       end
     end
   end

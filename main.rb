@@ -91,14 +91,14 @@ class MyConfig < Conf
     self.on_draw do |screen,dt|
       #move
       @scrolltimer.wait(dt) do
-	@shiftx += 1 ; @shiftx = -(@configback.w-1) if @shiftx>0
-	@shifty += 1 ; @shifty = -(@configback.h-1) if @shifty>0
+        @shiftx += 1 ; @shiftx = -(@configback.w-1) if @shiftx>0
+        @shifty += 1 ; @shifty = -(@configback.h-1) if @shifty>0
       end
       #draw
       for y in 0..(screen.h/@configback.h)+1
-	for x in 0..(screen.w/@configback.w)+1
-	  screen.put(@configback, x*@configback.w+@shiftx, y*@configback.h+@shifty)
-	end
+        for x in 0..(screen.w/@configback.w)+1
+          screen.put(@configback, x*@configback.w+@shiftx, y*@configback.h+@shifty)
+        end
       end
     end
   end

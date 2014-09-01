@@ -19,7 +19,7 @@ class Game
       wallbit = SDL::Surface.loadBMP("image/wall.bmp")
       @wallimg = SDL::Surface.new(SDL::SWSURFACE,CHAR,CHAR*HEI,wallbit)
       HEI.times do |i|
-	@wallimg.put(wallbit,0,i*CHAR)
+        @wallimg.put(wallbit,0,i*CHAR)
       end
       
       #init variables
@@ -34,11 +34,11 @@ class Game
       #init @data
       @data = Array.new(HEI)
       for i in 0...HEI
-	@data[i] = Array.new(WID,Chara::EMPTY)
+        @data[i] = Array.new(WID,Chara::EMPTY)
       end
 
       for i in 0...FLOORWID
-	@data[HEI-1][i+(WID-FLOORWID)/2] = Chara::BLOCK
+        @data[HEI-1][i+(WID-FLOORWID)/2] = Chara::BLOCK
       end
       
       #init variables
@@ -67,7 +67,7 @@ class Game
     def act(hito,dt)
       ret=0
       @falltimer.wait(dt) do
-	ret+=1 if scroll(hito,dt)
+        ret+=1 if scroll(hito,dt)
       end
       ret
     end
@@ -94,7 +94,7 @@ class Game
 
       #scroll @data & @floors & @items
       for i in 0...HEI-1
-	@data[i] = @data[i+1]
+        @data[i] = @data[i+1]
       end
       @data[HEI-1] = Array.new(WID,Chara::EMPTY)
 
@@ -104,12 +104,12 @@ class Game
 
       #make new floor(if @isfloor) & item(if @isfloor&&rand)
       if @isfloor then
-	pos,type = @floors.generate
-	for i in 0...FLOORWID
-	  @data[HEI-1][pos+i] = type
-	end
-	
-	if rand(100) <= ITEM_PERCENT && type!=Chara::HARI then
+        pos,type = @floors.generate
+        for i in 0...FLOORWID
+          @data[HEI-1][pos+i] = type
+        end
+        
+        if rand(100) <= ITEM_PERCENT && type!=Chara::HARI then
           case rand(100)
           when 0..33
             type = Chara::STAR
@@ -118,12 +118,12 @@ class Game
           when 67..99
             type = Chara::OMORI
           end
-	  x = pos+(FLOORWID/2)
-	  y = HEI-2
+          x = pos+(FLOORWID/2)
+          y = HEI-2
 
-	  @items.generate(type,x,y)
-	  @data[y][x] = type
-	end
+          @items.generate(type,x,y)
+          @data[y][x] = type
+        end
       end
 
       #invert @isfloor
@@ -157,30 +157,30 @@ class Game
       def initialize
         tmp = Util.cut_image( CHAR,CHAR,3, SDL::Surface.loadBMP("image/item.bmp") )
         @imgs = {Chara::STAR=>tmp[0], Chara::PARA=>tmp[1], Chara::OMORI=>tmp[2]}
-	reset
+        reset
       end
 
       def reset
-	@items=[]
+        @items=[]
       end
 
       def scroll
-	@items.each{|item| item.y-=1 }
-	@items.delete_if{|item| item.y<0}
+        @items.each{|item| item.y-=1 }
+        @items.delete_if{|item| item.y<0}
       end
       
       def generate(type,x,y)
-	@items << Item.new(type,x,y)
+        @items << Item.new(type,x,y)
       end
 
       def consume(x,y)
-	@items.delete_if{|item| x==item.x && y==item.y}
+        @items.delete_if{|item| x==item.x && y==item.y}
       end
 
       def draw(screen)
-	@items.each do |item|
-	  screen.put(@imgs[item.type], LEFT+item.x*CHAR, item.y*CHAR)
-	end
+        @items.each do |item|
+          screen.put(@imgs[item.type], LEFT+item.x*CHAR, item.y*CHAR)
+        end
       end
       
     end
@@ -193,40 +193,40 @@ class Game
       def initialize
         blockbit,haribit = Util.cut_image( CHAR,CHAR,2, SDL::Surface.loadBMP("image/floor.bmp") )
 
-	blockimg = SDL::Surface.new(SDL::SWSURFACE,CHAR*FLOORWID,CHAR,blockbit)
-	WID.times{|i| blockimg.put(blockbit,i*CHAR,0)}
-	hariimg = SDL::Surface.new(SDL::SWSURFACE,CHAR*FLOORWID,CHAR,haribit)
-	WID.times{|i| hariimg.put(haribit,i*CHAR,0)}
+        blockimg = SDL::Surface.new(SDL::SWSURFACE,CHAR*FLOORWID,CHAR,blockbit)
+        WID.times{|i| blockimg.put(blockbit,i*CHAR,0)}
+        hariimg = SDL::Surface.new(SDL::SWSURFACE,CHAR*FLOORWID,CHAR,haribit)
+        WID.times{|i| hariimg.put(haribit,i*CHAR,0)}
 
-	@img = { Chara::BLOCK => blockimg, Chara::HARI => hariimg }
-	self.reset
+        @img = { Chara::BLOCK => blockimg, Chara::HARI => hariimg }
+        self.reset
       end
 
       def reset
-	@floors = []
-	@floors << Floor.new(Chara::BLOCK, (WID-FLOORWID)/2, HEI-1, nil)
+        @floors = []
+        @floors << Floor.new(Chara::BLOCK, (WID-FLOORWID)/2, HEI-1, nil)
       end
       
       def scroll
-	@floors.each do |item|
-	  item.y -= 1
-	end
-	@floors.delete_if {|item| item.y<0} 
+        @floors.each do |item|
+          item.y -= 1
+        end
+        @floors.delete_if {|item| item.y<0} 
       end
 
       def generate
-	pos = rand(WID+FLOORWID) - FLOORWID
-	pos = 0 if pos < 0
-	pos = (WID-FLOORWID) if pos > (WID-FLOORWID)
+        pos = rand(WID+FLOORWID) - FLOORWID
+        pos = 0 if pos < 0
+        pos = (WID-FLOORWID) if pos > (WID-FLOORWID)
 
-	if rand(100) <= HARI_PER_FLOOR then
-	  type = Chara::HARI
-	else
-	  type = Chara::BLOCK
-	end
+        if rand(100) <= HARI_PER_FLOOR then
+          type = Chara::HARI
+        else
+          type = Chara::BLOCK
+        end
 
-	@floors << Floor.new(type,pos,HEI-1, nil)
-	return [pos,type]
+        @floors << Floor.new(type,pos,HEI-1, nil)
+        return [pos,type]
       end
 
       def break(field,x,y)
@@ -238,12 +238,12 @@ class Game
       end
       
       def draw(screen)
-	@floors.each do |floor|
+        @floors.each do |floor|
           screen.put(@img[floor.type], LEFT+floor.x*CHAR, TOP+floor.y*CHAR)
           if floor.broken != nil
             screen.fillRect( LEFT+(floor.x+floor.broken)*CHAR, TOP+floor.y*CHAR, CHAR, CHAR, [0,0,0])
           end
-	end
+        end
       end
     end
     #------------------------------------------------------------------------------

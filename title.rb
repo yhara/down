@@ -46,12 +46,12 @@ class Title
           #key check
           case event.sym
           when SDL::Key::UP, SDL::Key::K
-	    SDL::Mixer.playChannel(-1,@snd_move,0) if $CONF_SOUND   #0=no loop(play only one time)
+            SDL::Mixer.playChannel(-1,@snd_move,0) if $CONF_SOUND   #0=no loop(play only one time)
             @cursor-=1 
             @cursor = @menu.size-1 if @cursor<0
             
           when SDL::Key::DOWN, SDL::Key::J
-	    SDL::Mixer.playChannel(-1,@snd_move,0) if $CONF_SOUND
+            SDL::Mixer.playChannel(-1,@snd_move,0) if $CONF_SOUND
             @cursor+=1 
             @cursor = 0 if @cursor>@menu.size-1
 
@@ -70,9 +70,9 @@ class Title
       
       @menu.each_with_index do |item,i|
         color = (i==@cursor) ? COL_HILIGHT : COL_NORMAL
-	s = (i==@cursor) ? "<#{item.name}>" : item.name
-	x = (@screen.w - @font.textSize(s)[0])/2
-	@font.drawBlendedUTF8(@screen, s, x, 300+i*50, *color)
+        s = (i==@cursor) ? "<#{item.name}>" : item.name
+        x = (@screen.w - @font.textSize(s)[0])/2
+        @font.drawBlendedUTF8(@screen, s, x, 300+i*50, *color)
       end
       
       @screen.flip

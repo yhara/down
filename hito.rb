@@ -63,20 +63,20 @@ class Game
       
       #move (if keydown)
       if !(@state.gameover?)
-	@walktimer.wait(dt) do
+        @walktimer.wait(dt) do
           #move
-	  return 0 if key.left && key.right
-	  if key.left then
-	    @x-=1 if @x>0 && field.can_pass?(@x-1,@y)
-	  elsif key.right then
-	    @x+=1 if @x<Field::WID-1 && field.can_pass?(@x+1,@y)
-	  end
-	end
+          return 0 if key.left && key.right
+          if key.left then
+            @x-=1 if @x>0 && field.can_pass?(@x-1,@y)
+          elsif key.right then
+            @x+=1 if @x<Field::WID-1 && field.can_pass?(@x+1,@y)
+          end
+        end
       
         #get item
-	case field[@x,@y]
+        case field[@x,@y]
         when Chara::STAR
-	  field.consume_item(@x,@y)
+          field.consume_item(@x,@y)
           @state.on(:muteki)
           @mutekistart = SDL::getTicks
           SDL::Mixer.pauseMusic if $CONF_MUSIC
@@ -96,7 +96,7 @@ class Game
           @state.off(:para)
           @hitoimgs = @omoriimgs
           SDL::Mixer.playChannel(-1,$sound.getomori,0) if $CONF_SOUND
-	end
+        end
 
         #stop omori
         if @state.omori? && @state.muteki? && (SDL::getTicks - @mutekistart >= (MUTEKI_TIME*0.8))
@@ -105,11 +105,11 @@ class Game
           field.scroll_wait = Wait::FALL
         end
         #stop muteki
-	if @state.muteki? && (SDL::getTicks - @mutekistart >= MUTEKI_TIME)
+        if @state.muteki? && (SDL::getTicks - @mutekistart >= MUTEKI_TIME)
           @state.off(:muteki)
           @hitonum = 0
           SDL::Mixer.resumeMusic if $CONF_MUSIC
-	end
+        end
         #stop para
         if @state.para? && field[@x,@y+1]==Chara::HARI && !@state.muteki?
           @state.off(:para)
@@ -138,12 +138,12 @@ class Game
       
       #decide which img to show
       if @state.flashing? then
-	@flashtimer.wait(dt) { @hitonum = (1 - @hitonum) } #0:white 1:red
+        @flashtimer.wait(dt) { @hitonum = (1 - @hitonum) } #0:white 1:red
       end
       if @state.muteki? then
-	@mutekiflashtimer.wait(dt) { @hitonum+=1; @hitonum=0 if @hitonum>6 }
-	#newwait = (Wait::MUTEKIFLASH * (MUTEKI_TIME-(SDL::getTicks-@mutekistart)) / MUTEKI_TIME )+1
-	# @mutekiflashtimer.set_wait(newwait)
+        @mutekiflashtimer.wait(dt) { @hitonum+=1; @hitonum=0 if @hitonum>6 }
+        #newwait = (Wait::MUTEKIFLASH * (MUTEKI_TIME-(SDL::getTicks-@mutekistart)) / MUTEKI_TIME )+1
+        # @mutekiflashtimer.set_wait(newwait)
       end
 
       return ret
@@ -153,11 +153,11 @@ class Game
       screen.put(@hitoimgs[@hitonum], Field::LEFT+@x*CHAR, Field::TOP+@y*CHAR)
 
       if @state.gameover? then
-	if @x<(Field::WID/2)
-	  screen.put(@sakebiimg, Field::LEFT+(@x+1)*CHAR, Field::TOP+@y*CHAR)
-	else
-	  screen.put(@sakebiimg, Field::LEFT+(@x-2)*CHAR, Field::TOP+@y*CHAR)
-	end
+        if @x<(Field::WID/2)
+          screen.put(@sakebiimg, Field::LEFT+(@x+1)*CHAR, Field::TOP+@y*CHAR)
+        else
+          screen.put(@sakebiimg, Field::LEFT+(@x-2)*CHAR, Field::TOP+@y*CHAR)
+        end
       end
     end
   end
