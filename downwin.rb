@@ -1,5 +1,5 @@
 #
-# downwin.rb : ウィンドウズ上からフォームを表示して起動する
+# downwin.rb : Show windows form and start game
 #
 
 require 'vr/vruby'
@@ -35,7 +35,7 @@ module Frm_form
   end
 
   def self_close
-    #「閉じる」ボタン
+    # Close button
     @exec = false
   end
   attr_reader :exec

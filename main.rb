@@ -13,38 +13,16 @@ require 'game.rb'
 require 'misc.rb'
 
 #---------------------------------------------------------------------
-=begin
-=SavedataManager
-セーブデータと、そのファイルへの読み書きをカプセル化したクラス。みたいな
-
-Marshalを使用しているので、（相対的に）古いRubyではロードが出来ない可能性があります。だめぽ
-
-==クラスメソッド
---- SavedataManager.new(fname)
-    セーブファイルをファイルfnameとし、新しいSavedataManagerオブジェクトを返します。
-
-==メソッド
---- read
-    セーブファイルからセーブデータを読み込みます。（Marshal.loadを使用します）
-    読み込んだデータを返します。ファイルが存在しなかった場合はnilを返します。
-   
---- set(data)
-    セーブデータをセットします。いろいろなデータをセーブしたいときはArrayやHashで固めてください。
-    例
-      savedata.set( [highscore,name] )
-      savedata.set( {"highscore"=>highscore, "name"=>name} )
-    後者の形式の方が変更に強くて良いかもしれません。
-
---- write
-    セーブデータをファイルに書き込みます。（Marshal.dumpを使用します）
-=end
-
+# Save/load game data using Marshal.dump
+# (Note: Marshal format may be incompatible between Ruby versions!)
 class SavedataManager
 
   def initialize(fname)
     @fname = fname
   end
 
+  # Load savedata from the file
+  # (Return nil if the file does not exist)
   def read
     return nil if FileTest.exist?(@fname)==false
 
@@ -54,17 +32,22 @@ class SavedataManager
     @data
   end
 
+  # Set savedata
+  # eg.
+  #   savedata.set( [highscore,name] )
+  #   savedata.set( {"highscore"=>highscore, "name"=>name} )
   def set(data)
     @data = data
   end
 
+  # Write savedata to file
   def write
     open(@fname,"wb") do |file|
       Marshal.dump(@data,file)
     end
   end
 end
-#--------------------------------------------------------------------
+
 class MyConfig < Conf
   #constants
   FONT_CONFIG = "image/boxfont2.ttf"
@@ -102,9 +85,8 @@ class MyConfig < Conf
       end
     end
   end
-
 end
-#---------------------------------------------------------------------
+
 class Main
 
   #init SDL
@@ -171,7 +153,6 @@ class Main
     @svmanager.write
   end
   
-  #----private methods----
 private  
 
   def logo

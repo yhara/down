@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-# down.rb : コマンドラインから起動するためのスクリプト
+# down.rb : Entrypoint for command-line
 #
 $LOAD_PATH.unshift "."
 require "main.rb"

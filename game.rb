@@ -173,7 +173,7 @@ class Game
         SDL::Mixer.playChannel(-1,$sound.gameover,0) if $CONF_SOUND
       end
     else
-      #一定時間後、ゲームを最初から始める
+      # Restart game after a while
       @gameovertimer.wait(dt) do
         unless @demo
           if @highscores.size<HIGHSCORES || @highscores[-1].score<@score
@@ -216,7 +216,7 @@ class Game
     @font.drawBlendedUTF8(@screen,"FPS:#{@system.fps}",      640-80, 0, 127,127,127)
     @font.drawBlendedUTF8(@screen,"SCORE RANKING",           Field::RIGHT+32, 2, 255,255,255)
     @highscores[0,HIGHSCORES].each_with_index do |score,i|
-      color = (score.version<Score::VERSION) ? [127,127,127] : [200,255,255]  #古いスコアは灰色で
+      color = (score.version<Score::VERSION) ? [127,127,127] : [200,255,255]  # Use gray for old score
       @font.drawBlendedUTF8(@screen,sprintf("%2d: %6d %s",i+1, score.score, score.name), Field::RIGHT+32, 25*(i+1), *color)
     end
     @font.drawBlendedUTF8(@screen,"SCORE:#{@score}",         Field::RIGHT+32, 300 , 255,255,255)
@@ -311,7 +311,7 @@ class Game
       @screen.fillRect(0,0,640,480,0)
       @font.drawBlendedUTF8(@screen,"SCORE RANKING",           Field::RIGHT+32, 2, 255,255,255)
       @highscores[0,HIGHSCORES].each_with_index do |score,i|
-        color = (score.version<Score::VERSION) ? [127,127,127] : [200,255,255]  #古いスコアは灰色で
+        color = (score.version<Score::VERSION) ? [127,127,127] : [200,255,255]  # Use gray for old score
         @font.drawBlendedUTF8(@screen,sprintf("%2d: %6d %s",i+1, score.score, score.name), Field::RIGHT+32, 25*(i+1), *color)
       end
       @font.drawBlendedUTF8(@screen,"SCORE:#{@score}",         Field::RIGHT+32, 300 , 255,255,255)
@@ -340,18 +340,18 @@ class Game
   private :nameentry
 
   #-------------------------------------------------------------------
-  # 人工無能 (てきとう)
+  # AI (for demo mode)
   #-------------------------------------------------------------------
   def auto_decide(field,hito)
     key = Keydata.new
     key.left = key.right = false
 
-    #空中なら移動しない
+    # Do not move when floating
     if @field.can_pass?(@hito.x, @hito.y+1)
       return key
     end
     
-    #右端なら、左に行くしかない
+    # Go left when on the right end
     x = @hito.x
     until @field.can_pass?(x, @hito.y+1)
       x+=1; break if x>=Field::WID
@@ -361,7 +361,7 @@ class Game
       return key
     end
     r=x
-    #左端なら、右に行くしかない
+    # Go right when on the left end
     x = @hito.x
     until @field.can_pass?(x, @hito.y+1)
       x-=1; break if x<0
@@ -371,9 +371,9 @@ class Game
       return key
     end
     l=x
-    #それ以外なら…
+    # Otherwise:
 
-    #右に落ちたときの状態を調べる
+    # Check what happens falling from the right end
     y = @hito.y
     until @field[r,y] != Chara::EMPTY
       y+=1; break if y>=Field::HEI
@@ -385,7 +385,7 @@ class Game
     end
     yr=y
 
-    #左に落ちたときの状態を調べる
+    # Check what happens falling from the left end
     y = @hito.y
     until @field[l,y] != Chara::EMPTY
       y+=1; break if y>=Field::HEI
@@ -398,20 +398,20 @@ class Game
     yl=y
 
     if @field[@hito.x, @hito.y+1]==Chara::HARI
-      #針の上なら、近い方に逃げる
+      # Go nearer end when on a needle
       if (r-@hito.x) < (@hito.x-l)
         key.right=true
       else
         key.left=true
       end
     else
-      #さもなくば、針の無い方に落ちる
+      # Go opposite side from needle
       if lstat==Chara::HARI
         key.right=true
       elsif rstat==Chara::HARI
         key.left=true
       else
-        #どっちでも良ければ、近い方に落ちる
+        # Go nearer end when both sides are safe
         if (r-@hito.x) < (@hito.x-l)
           key.right=true
         elsif (r-@hito.x) > (@hito.x-l)
