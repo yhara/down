@@ -2,6 +2,7 @@
 #
 # down.rb : Entrypoint for command-line
 #
+Dir.chdir(File.dirname(__FILE__))
 $LOAD_PATH.unshift "."
 require "main.rb"
 
