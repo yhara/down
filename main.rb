@@ -112,7 +112,7 @@ class Main
     SDL::WM.setCaption("DOWN!!v#{Main::VERSION} on Ruby/SDL","DOWN!!v#{Main::VERSION}")
     
     #load
-    @svmanager = SavedataManager.new("save.dat")
+    @svmanager = SavedataManager.new($OPT_savefile)
     savedata = @svmanager.read
     savedata = {} unless savedata.is_a? Hash
     svversion  = savedata["savedata-version"] || 0
