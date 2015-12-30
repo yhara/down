@@ -1,36 +1,24 @@
 #
-# conf.rb
+# conf.rb : Config menu for Ruby/SDL games
 #
 
 =begin
-= ruby/SDLなゲーム用 configメニュー 
 
-==概要
-configです。自分用に作っただけなんで、まだロクにテストしてません :-P
-つーか１年ほどほっといたんで自分でも良くわからなくなってます。
+== Example
 
-  menu = なんとかかんとか（データ形式 を参照）
-  screen = SDL::setVideoMode(...
-  font = SDL::TTF.open(...
-  conf = Conf.new(screen,font,menu)
-
-で準備完了、あとは conf.run でインタラクティブかつグラフィカルなコンフィグ画面が。
-
-==簡単な使用例
-
-  #SDLの準備
+  # Initialize SDL
   SDL.init(SDL::INIT_VIDEO)
   screen = SDL::setVideoMode(640,480,16,SDL::SWSURFACE)
 
   SDL::TTF.init
   font = SDL::TTF.open("font.ttf",24)
 
-  #コンフィグデータのロード
+  # Load config data
   open("savedata.dat","r") do |file|
     configdata = Marshal.load(file)
   end
 
-  #メニューデータの定義
+  # Define menu
   menu = [
     ["Level", ["Easy","Normal","Hard"] ],
     ["Music", [true,false] ],
@@ -39,81 +27,107 @@ configです。自分用に作っただけなんで、まだロクにテスト�
     ["#Exit"]
   ]
 
-  #コンフィグオブジェクトの生成
+  # Create Conf
   conf = Conf.new(screen,font,menu,configdata)
 
-  #ゲーム本体の実行...
-    #コンフィグメニューの実行
-    conf.run
+  # Run config menu
+  # Will define $CONF_Level, $CONF_Music and $CONF_Sound 
+  conf.run
 
-  #データセーブ
+  # Save config data
   open("savedata.dat","w") do |file|
     Marshal.dump( conf.data, file )
   end
 
-==複雑な使用例(応用編)
-以下のようなやりかたで、コンフィグメニューを「入れ子」にすることができます。
+== Defining menu
 
-  #子の定義
+Example:
+
+  menu = [
+    ["display", ["window","fullscreen"]],
+    ["sound", ["on","off","auto"]],
+    ["music vol", ["off","10","20","30","40","50","60","70","80","90","100"], false ],
+    [],
+    ["key config",Proc.new{key_config}]
+    ["#exit"]
+  ]
+
+Menu item is one of the following.
+
+* Choice
+   # Example 1
+   ["Level", ["Easy", "Hard"]]
+
+   - "Easy" or "Hard" is set to $CONF_Level
+
+   # Example 2
+   ["Music", [true,false], true]
+
+   - true or false is set to $CONF_Music
+   - true/false is shown as "ON"/"OFF" in the screen (can be changed
+   by Conf#true_string, #false_string)
+   - 3rd argument : whether to loop the selection
+
+   # Example 3
+   ["MUSIC VOL", [0,10,20,30,40,50,60,70,90,90,100]] 
+   
+   - A value between 0 and 100 is set to $CONF_MUSIC_VOL
+     (Spaces in menu title will be converted to `_`. Only alphabet,
+     numbers, space and `_` are allowed in menu title)
+
+* Command  
+   ["key config", proc{key_config} ]
+
+  Execute the proc when selected (space or enter is hit)
+
+*Space
+   [] or [nil]
+
+  Vertical space
+
+*Exit
+   ["#exit"] or ["#EXIT"] or ["#Exit"]
+
+  Quit menu when selected
+
+== Advanced usage
+
+Menus can be nested when Proc is specified as options.
+
+  # Child menu
   menu_sound = [
     ["Music", ["On","Off"] ],
     ["Sound", ["On","Off"] ],
-    ["Sampling Rate", [44100,22050,11025] ]  #数値も渡せるのです :)
+    ["Sampling Rate", [44100,22050,11025] ]  # You can pass numbers, too :)
     [],
     ["#Exit"]
   ]
   conf_sound = Conf.new(screen,font,menu_sound)
 
-  #親の定義
+  # Parent menu
   menu_main = [
     ["Level", ["Easy","Normal","Hard","Maniac"] ],
     [],
-    ["Sound Settings", proc{ conf_sound.run }], #ここがポイント
+    ["Sound Settings", proc{ conf_sound.run }], # Put proc here
     [],
     ["#Exit"]
   ]
   conf_main = Conf.new(screen,font,menu_main)
 
-  #実行
+  # Run
   conf_main.run
 
-組み込みの["#Exit"]は、以下と同じです。
+["#Exit"] is equivalent to:
+
   conf = Conf.new(screen,font)
   conf.add_menuitem( ["Exit",proc{conf.quit}] )
 
-==config画面での操作方法
-上下で項目の選択、左右で選択肢の選択。SPACEまたはENTERで項目の実行、ESCで終了
+== Control
 
-==TODO
-
-*(大きい空行) <=いらんか？
-*(キー定義を可変に（そこまでするか？）)
-* Choiceにブロックを渡すと項目変更時に選択項目を渡して実行してくれる。っての
-    ["sound",["on","off], proc{|select| if select=="on" then flag_sound=true end} ]
-  とか。
-* "#Key Conf"で簡易キーコンフィグ(Conf::KeyConfのオブジェクト)を実行
-* 音設定
-
-==内部実装について
-
-*データとして配列@menuとハッシュ@selectedとグローバル変数$CONF_xxを持つ。
-*@menuは、クラス(実は構造体)Choice,Command,Spaceのオブジェクトを要素に持つ配列。
-
-以下は古い情報。
-
-*データとして配列@menuと、ハッシュ@selectedと、ハッシュ@configdataの3つを持つ。
- (これらの同期をとるのがめんどくさいっぽい)
-*@menuはプログラムに対し静的なので、セーブするときには@configdataだけがあればよい。
-*とすると、initializeにはmenudataとconfigdataしか渡されない(@selectedはそれらから生成する)
-*またmenudataのみしか渡されない場合もある。
-
-*runにおいては@selectedのみを操作し、runの終了時に@selected => @configdataとする。(Conf#renew_configdata)
- 即ちrunする前に、@selectedが@configdataに同期している必要がある。
-*$CONF_xxがあれば@configdataはいらない。
- データのセーブ方法を新しく考える必要あり。
-*["music"=>$CONF_music,"sound"=>$CONF_sound, ...]みたいなハッシュをセーブ時に作成して
-
-*initializeとloadをわけるとか
+* Key Up, Down : choose menu item
+* Key Right, Left : choose menu option
+* Space, Enter : select option
+* Esc : quit menu
 
 =end
 
@@ -131,51 +145,8 @@ private
   Command = Struct.new("Command",:name,:proc)
   Space = Struct.new("Space",:enlarge)
 
-=begin  
-==データ形式
-  menu = [
-    ["display", ["window","fullscreen"]],
-    ["sound", ["on","off","auto"]],
-    ["music vol", ["off","10","20","30","40","50","60","70","80","90","100"], false ],
-    [],
-    ["key config",Proc.new{key_config}]
-    ["#exit"]
-  ]
-とか。
-
-各メニュー項目は、
-*Choice
-   ["Music", [true,false]]
- 選択。第３引数でループするかどうかを指定できます ((-やめるかも-))
-
- この場合、$CONF_Musicという変数にtrueもしくはfalseがセットされます。
- 画面上では、true→"ON", false→"OFF"と表示されます（設定可能）。
-
- よって、Choiceの項目名には半角英数字と空白、`_'以外の文字は使えません。空白は'_'に変換されます。
-
- 例:
-   ["MUSIC VOL",[0,10,20,(省略),90,100 ]]  #=> $CONF_MUSIC_VOL = 0 等
-*Command  
-   ["key config", proc{key_config} ]
- spaceまたはenterが押されたときにProcを実行
-*Space
-   []または[nil]
- 空行。
-*Exit
-   ["#exit"]または["#EXIT"]または["#Exit"]
- 選択されたときにメニューを終了
-
-のどれかを指定します。
-
-Choiceの選択肢にはStringの他、Fixnum等も使えます（表示時に.to_sしているので）。
-Choice,Commandの項目名はStringしか使えません(それ以外のものを渡すとArgumentErrorが発生します)。
-
-Choiceの項目名は重複させるべきではありません（重複するとConf#[]とかConf#dataで困ることになるでしょう）。
-=end
-
-  # 上のフォーマットに従った配列を受け取り、
-  # 適切なオブジェクト(Choice,Command,Space)を返す。
-  # さらに@selected,$CONF_xxを初期化する。
+  # Convert menu definition to Choice/Command/Space
+  # Initialize @selected and $CONF_xx
   def menuitemize(item)
     case item.size
     when 0
@@ -196,7 +167,7 @@ Choiceの項目名は重複させるべきではありません（重複する�
       end
       
     when 2
-      if item[0]==nil then  #大きい空白（未実装）
+      if item[0]==nil then
         Space.new(item[1])
       elsif item[1].is_a? Proc then
         raise ArgumentError,"title of a Command must be String" unless item[0].is_a? String
@@ -215,7 +186,7 @@ Choiceの項目名は重複させるべきではありません（重複する�
     end
   end
 
-  #空白をスペースに、記号が入ってたらエラー
+  # Replace spaces with `_`
   def quote_space(name)
     raise ArgumentError,"title of Choice must be String" unless name.is_a? String
     if name=~/[^A-Za-z0-9_ ]/ then
@@ -224,8 +195,6 @@ Choiceの項目名は重複させるべきではありません（重複する�
     name.gsub(/ /,"_")
   end
 
-  # @selected -> $CONF_xx
-  # (runの終了時に使う)
   def renew_configdata
     @menu.each do |item|
       if item.is_a? Choice then
@@ -235,18 +204,15 @@ Choiceの項目名は重複させるべきではありません（重複する�
     end
   end
   
-public
+  public
 
-=begin
-==クラスメソッド
---- initialize(screen,font[,menudata])
-    Confクラスのオブジェクトを生成して返します。
-
-    screenにはSDLのscreenを、fontにはSDL::TTFオブジェクトを、
-    menudataにはコンフィグメニューのメニューデータを指定します（((<データ形式>))を参照）。
-
-    menudataを省略した場合は、Conf#runを呼ぶ前に必ずConf#add_menuitem(s)によりメニューデータを与えなければいけません。
-=end
+  # initialize(screen,font[,menudata])
+  #
+  # - `screen`: SDL screen
+  # - `font`: SDL::TTF
+  # 
+  # When `menudata` is omitted, you must call Conf#add_menuitem(s) before
+  # calling Conf#run.
   def initialize(*args)
     raise ArgumentError,"wrong # of arguments" if args.size<2 || args.size>4
     #screen
@@ -276,73 +242,54 @@ public
     end
   end
 
+  # Top margin, left margin, line height (px)
   attr_accessor :margin_top,:margin_left,:line_height
 
-=begin   
-==メソッド
---- margin_top
---- margin_left
---- line_height
-    それぞれ、コンフィグ画面の上の余白、左の余白、１行の高さを表します。代入もできます。デフォルトでは
-      margin_top  = 32
-      margin_left = 32
-      line_height = (文字列"pjfM"を現在のフォントで描画したときの高さ) * 1.5
-    となっています。（単位：pixel）
-
---- add_menuitem(item)
-    新しいメニューアイテムitemを追加します。itemはArrayです（((<データ形式>))を参照）。
---- add_menuitems(items)
-    複数のメニューアイテムitems(Array)を追加します。（参照：((<データ形式>))）
---- quit
-    実行中のコンフィグメニューを終了します。Command形式のメニューアイテムで使います（((<データ形式>))を参照）。
---- on_draw{|screen,dt| ... }
-    画面の書き換え時に実行される処理を指定します。この処理はループ毎に実行され、この処理のあとに文字が描画されます。
-    dtは前回呼び出し時からの経過時間(ms)です。
-
-    使用例:
-      conf.on_draw{|screen,dt|
-        screen.fillRect(0,0,screen.w, screen.h,[255,255,255])
-      }     
---- true_string(str)
---- false_string(str)
-    Choiceの選択肢にtrue/falseを指定したときに表示される文字列を指定します。
-    デフォルトではそれぞれ"ON","OFF"です。
-=end
-
+  # Add menu item
   def add_menuitem(item)
     raise ArgumentError,"#{item} is not an Array" if !item.is_a? Array
     raise ArgumentError,"wrong # of arguments" if item.size>3
     @menu << menuitemize(item)
   end
 
+  # Add menu items
   def add_menuitems(items)
     items.each do |item|
       add_menuitem(item)
     end
   end
 
+  # Quit running config menu
   def quit
     @running=false
   end
 
+  # Set Proc to draw background
+  #
+  # Example:
+  #      conf.on_draw{|screen,dt|
+  #        # dt: time passed since the last call (ms)
+  #        screen.fillRect(0,0,screen.w, screen.h,[255,255,255])
+  #      }     
   def on_draw(&block)
     @ondraw = block
   end
 
+  # Set a string to show when `true` is passed as menu option
+  # default: "ON"
   def true_string(str)
     @true_string = str
   end
+
+  # Set a string to show when `false` is passed as menu option
+  # default: "OFF"
   def false_string(str)
     @false_string = str
   end
   
-=begin
---- run
-    コンフィグメニューを実行します。操作は((<config画面での操作方法>))を参照してください。
-
-    また、現在の仕様では実行するとキーリピートがオフになります。注意してください。
-=end
-
+  # Run config menu
+  #
+  # FIXME: this method calls SDL::Key.disableKeyRepeat
   def run
     #data check
     if @menu.size == 0 then
@@ -462,22 +409,10 @@ public
     end
   end
 
-=begin
---- savedata
-    コンフィグデータをMarshal可能なオブジェクトに変換したものを返します。(現在の実装では、Hashが返されます)
-
-    Conf.initializeやConf#add_menuitems等でメニューデータをセットしてから呼び出してください。
-    ((-というのは、$CONF_xxのうち、メニューデータにあるものしかセーブしないからです。-))
-
---- loaddata(data)
-    Conf#savedataが返したオブジェクトを読み込みます。dataが明かに不適切(つまり現在の実装では、Hash以外)な時は
-    何もしません。
-
-    Conf.initializeやConf#add_menuitems等でメニューデータをセットしてから呼び出してください。
-    ((-というのは、メニューデータをセットする時に「どれを選んだか」という情報がリセットされるからです。
-    これは直そうとすれば直せるのですが、コードが少し複雑になるので仕様としています。-))
-=end
-
+  # Returns save data converted to a Marshalable object (Hash).
+  #
+  # Do not call this method before setting menu data (with #initialize
+  # or #add_menuitems).
   def savedata
     ret = {}
     @menu.each do |item|
@@ -489,9 +424,12 @@ public
     ret
   end
 
-  #savedata => $CONF_xx, @selected
+  # Load a save data, which is returned by Conf#savedata
+  #
+  # Do not call this method before setting menu data (with #initialize
+  # or #add_menuitems).
   def loaddata(savedata)
-    return unless savedata.is_a? Hash
+    raise TypeError unless savedata.is_a? Hash
       
     #savedata => $CONF_xx
     savedata.each_key do |key|
