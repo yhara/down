@@ -2,11 +2,8 @@
 # main.rb
 #
 
-class Main
-  VERSION = 0.53
-end
-  
 require 'sdl'
+require 'version.rb'
 require 'title.rb'
 require 'conf.rb'
 require 'game.rb'
