@@ -107,7 +107,8 @@ class Main
     else
       @screen = SDL::setVideoMode(640,480,16,SDL::SWSURFACE|SDL::DOUBLEBUF)
     end
-    SDL::WM.setCaption("DOWN!!v#{Main::VERSION} on Ruby/SDL","DOWN!!v#{Main::VERSION}")
+    SDL::WM.setCaption("DOWN!! v#{Main::VERSION}", "DOWN!!")
+    SDL::WM.icon = SDL::Surface.load_bmp("image/icon_32x32.bmp")
     
     #load
     if !File.directory?(File.dirname($OPT_savefile))
