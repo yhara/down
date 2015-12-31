@@ -221,7 +221,7 @@ class Game
     end
     @font.drawBlendedUTF8(@screen,"SCORE:#{@score}",         Field::RIGHT+32, 300 , 255,255,255)
     @font.drawBlendedUTF8(@screen,"LIFE",                    Field::RIGHT+32, 330 , 255,255,255)
-    @font.drawBlendedUTF8(@screen,"Ver.#{Main::VERSION}",     640-86, 460 , 127,127,127)
+    @font.drawBlendedUTF8(@screen,"Ver.#{Main::VERSION}",     640-106, 460 , 127,127,127)
     
     @field.draw(@screen)
     @hito.draw(@screen)
