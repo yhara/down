@@ -3,6 +3,7 @@
 #
 
 require 'sdl'
+require 'fileutils'
 require 'version.rb'
 require 'title.rb'
 require 'conf.rb'
@@ -109,6 +110,10 @@ class Main
     SDL::WM.setCaption("DOWN!!v#{Main::VERSION} on Ruby/SDL","DOWN!!v#{Main::VERSION}")
     
     #load
+    if !File.directory?(File.dirname($OPT_savefile))
+      warn "ERROR: directory not exist: #{$OPT_savefile}"
+      exit
+    end
     @svmanager = SavedataManager.new($OPT_savefile)
     savedata = @svmanager.read
     savedata = {} unless savedata.is_a? Hash

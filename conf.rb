@@ -429,7 +429,7 @@ private
   # Do not call this method before setting menu data (with #initialize
   # or #add_menuitems).
   def loaddata(savedata)
-    raise TypeError unless savedata.is_a? Hash
+    return if savedata.nil?
       
     #savedata => $CONF_xx
     savedata.each_key do |key|
