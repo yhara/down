@@ -24,7 +24,8 @@ Mac (source)
 Linux (source)
 --------------
 
-* Install SDL 1.3.x, SDL_TTF, SDL_Mixer(with mod support)
+* Install SDL, SDL_TTF, SDL_Mixer(with mod support)
+  - eg. `apt install libsdl1.2debian libsdl1.2-dev libsdl-ttf2.0-0 libsdl-ttf2.0-dev libsdl-mixer1.2 libsdl-mixer1.2-dev`
 * `gem install rubysdl`
 * `ruby down.rb`
 
@@ -44,7 +45,7 @@ MIT
 History
 =======
 
-* (v1.0.0)
+* 2015-12-31 v1.0.0
   - Added --savefile option
 * 2014-05-19 v0.53
   - Support Ruby >= 1.9, etc.
