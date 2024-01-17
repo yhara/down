@@ -16,8 +16,7 @@ Execute down.exe (This is compiled version of Down v0.52)
 Mac (source)
 ------------
 
-    $ brew install sdl sdl_ttf
-    $ brew install sdl_mixer --with-libmikmod
+    $ brew install sdl sdl_ttf sdl_mixer
     $ gem install rubysdl rsdl
     $ rsdl down.rb
 
