@@ -17,8 +17,8 @@ Mac (source)
 ------------
 
     $ brew install sdl sdl_ttf sdl_mixer
-    $ gem install rubysdl rsdl
-    $ rsdl down.rb
+    $ gem install rubysdl
+    $ ruby down.rb
 
 Linux (source)
 --------------
